@@ -34,11 +34,19 @@ struct BrowserView: View {
         return url
     }
 
+    /// 无痕时外壳用深色（与 Safari 私密大致一致）；普通模式跟系统。
+    private var chromeRootBackground: Color {
+        if viewModel.browsingMode == .incognito {
+            return Color(red: 0.07, green: 0.08, blue: 0.10)
+        }
+        return Color(.systemGroupedBackground)
+    }
+
     var body: some View {
         // ZStack：下层背景、上层主内容叠在一起。
         ZStack {
-            // 系统分组背景色，铺满包括刘海区域。
-            Color(.systemGroupedBackground)
+            // 铺满含刘海；无痕为深灰底。
+            chromeRootBackground
                 .ignoresSafeArea()
 
             // 垂直排列：地址栏 → 模式切换 → Web 区域 → 进度条。
@@ -56,12 +64,21 @@ struct BrowserView: View {
                     // 条件视图：只有 showsWelcome 为 true 才构造 welcomeOverlay。
                     if showsWelcome {
                         welcomeOverlay
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .background(viewModel.browsingMode == .incognito ? chromeRootBackground : Color.clear)
                             // 叠层不参与点击，手势交给下层 WebView（空白页时意义不大，但习惯上避免挡交互）。
                             .allowsHitTesting(false)
                     }
                 }
-                // 连续圆角矩形，与系统卡片风格一致。
+                // 连续圆角矩形；无痕时加淡描边，区分「外壳深色」与网页亮内容区。
                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .strokeBorder(
+                            viewModel.browsingMode == .incognito ? Color.white.opacity(0.12) : Color.clear,
+                            lineWidth: 1
+                        )
+                )
                 .padding(.horizontal, 12)
                 .padding(.bottom, 8)
 
@@ -98,6 +115,8 @@ struct BrowserView: View {
         .sheet(isPresented: $showBookmarks) {
             BookmarksSheet(viewModel: viewModel)
         }
+        // 无痕：状态栏、地址栏、分段、底栏等走暗黑语义色；网页本身由 WKWebView.overrideUserInterfaceStyle = .light 保持浅色结果页。
+        .preferredColorScheme(viewModel.browsingMode == .incognito ? .dark : nil)
     }
 
     /// 顶部一行：左侧输入区 + 右侧「前往」。

@@ -32,6 +32,13 @@ struct BrowserWebView: UIViewRepresentable {
 
         // frame: .zero 表示交给 Auto Layout / SwiftUI 布局决定最终大小。
         let webView = WKWebView(frame: .zero, configuration: config)
+        // 外壳无痕时 App 会用深色配色；此处强制网页按「浅色」渲染，避免 `prefers-color-scheme: dark` 把搜索结果整站变黑。
+        switch viewModel.browsingMode {
+        case .incognito:
+            webView.overrideUserInterfaceStyle = .light
+        case .normal:
+            webView.overrideUserInterfaceStyle = .unspecified
+        }
         // navigationDelegate：加载进度、完成、失败。
         webView.navigationDelegate = context.coordinator
         // uiDelegate：如 window.open、alert 等（这里只处理一种）。
@@ -55,8 +62,15 @@ struct BrowserWebView: UIViewRepresentable {
         return webView
     }
 
-    /// 当 SwiftUI 状态更新且未重建 UIView 时调用；本工程靠 .id 重建 WebView，这里留空即可。
-    func updateUIView(_ uiView: WKWebView, context: Context) {}
+    /// 模式切换若未触发整视图重建时，仍保证网页区域保持浅色（与无痕暗黑壳搭配）。
+    func updateUIView(_ uiView: WKWebView, context: Context) {
+        switch viewModel.browsingMode {
+        case .incognito:
+            uiView.overrideUserInterfaceStyle = .light
+        case .normal:
+            uiView.overrideUserInterfaceStyle = .unspecified
+        }
+    }
 
     /// Representable 从视图树移除时调用：必须解绑，否则会野指针或重复回调。
     static func dismantleUIView(_ uiView: WKWebView, coordinator: Coordinator) {
