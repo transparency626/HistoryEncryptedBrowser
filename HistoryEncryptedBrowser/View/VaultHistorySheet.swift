@@ -207,17 +207,17 @@ struct VaultHistorySheet: View {
     }
 
     /// 异步解锁：密码错会 throw，catch 里统一显示「密码错误」。
-    @MainActor
+    @MainActor   //主线程执行
     private func runUnlock() async {
-        errorMessage = ""
-        isBusy = true
-        defer { isBusy = false }
+        errorMessage = ""   //清除先前错误信息
+        isBusy = true   //设置忙碌状态
+        defer { isBusy = false }   //函数返回时复位忙碌状态
         do {
-            try await viewModel.unlockVault(password: unlockPassword)
-            unlockPassword = ""
+            try await viewModel.unlockVault(password: unlockPassword)   //解锁保险库    
+            unlockPassword = ""   //清除输入密码
         } catch {
             // 不区分具体错误类型，避免向用户泄露细节。
-            errorMessage = "密码错误"
+            errorMessage = "密码错误"   //显示密码错误信息
         }
     }
 }
