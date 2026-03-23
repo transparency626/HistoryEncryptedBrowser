@@ -1,14 +1,20 @@
+// CryptoKit：AES-GCM、SymmetricKey 等。
 import CryptoKit
 import Foundation
+// Security：SecKey、SecRandomCopyBytes、RSA-OAEP 等。
 import Security
 
-/// 对应 `vault-crypto.js`：RSA-OAEP(SHA-256) 封装随机 AES-256-GCM 密钥；记录与私钥均用 AES-GCM。
-/// 扩展里密码派生用 Argon2id；iOS 无内置 Argon2，此处用 **PBKDF2-HMAC-SHA256** 高迭代逼近「慢哈希」目的（与 Chrome 插件数据不互通）。
+/// 保险库密码学工具集：无实例，全是 static 方法。
+/// 设计对齐扩展 `vault-crypto.js`：记录 = 随机 AES-256-GCM 加密 JSON，AES 密钥再用 RSA-OAEP(SHA-256) 封装；私钥再用密码派生密钥做 AES-GCM。
+/// 密码派生：扩展用 Argon2id；iOS 用 PBKDF2-HMAC-SHA256 高迭代代替（数据与扩展不互通）。
 enum VaultCryptoService {
-    /// 与扩展「不宜过快」同量级目标；可按设备调整。
+    /// PBKDF2 迭代次数：越大越慢越抗暴力，主线程上会卡，故创建/解锁在 Task.detached 里做。
     static let pbkdf2Iterations: UInt32 = 250_000
+    /// 盐字节长度。
     static let saltLength = 16
+    /// AES-GCM 标准 nonce 长度 12 字节。
     static let aesIVLength = 12
+    /// RSA 模数位长。
     static let rsaBits = 2048
 
     enum VaultCryptoError: Error {
@@ -21,8 +27,9 @@ enum VaultCryptoService {
         case randomGenerationFailed
     }
 
-    // MARK: - Password key（扩展为 Argon2id；此处 PBKDF2-SHA256）
+    // MARK: - 密码 → 对称密钥（PBKDF2，经 Bridging Header 调 CommonCrypto）
 
+    /// 用密码 + 盐派生 32 字节 AES 密钥（封装为 SymmetricKey）。
     static func derivePasswordSymmetricKey(password: String, salt: Data) throws -> SymmetricKey {
         guard let pwdData = password.data(using: .utf8), !pwdData.isEmpty else { throw VaultCryptoError.invalidInput }
         var derived = Data(count: 32)
@@ -50,6 +57,7 @@ enum VaultCryptoService {
         return SymmetricKey(data: derived)
     }
 
+    /// 密码学安全随机字节；失败抛错而不是 precondition，避免线上直接崩。
     static func randomBytes(_ count: Int) throws -> Data {
         var d = Data(count: count)
         let status = d.withUnsafeMutableBytes { buf -> Int32 in
@@ -60,8 +68,9 @@ enum VaultCryptoService {
         return d
     }
 
-    // MARK: - RSA 2048
+    // MARK: - RSA 2048（SecKey）
 
+    /// 生成临时 RSA 密钥对（不写钥匙串）。
     static func generateRSAKeyPair() throws -> (publicKey: SecKey, privateKey: SecKey) {
         let attributes: [String: Any] = [
             kSecAttrKeyType as String: kSecAttrKeyTypeRSA,
@@ -78,6 +87,7 @@ enum VaultCryptoService {
         return (publicKey, privateKey)
     }
 
+    /// 公钥导出为 SPKI DER（与 importPublicKeySPKI 成对）。
     static func exportPublicKeySPKI(_ publicKey: SecKey) throws -> Data {
         var error: Unmanaged<CFError>?
         guard let data = SecKeyCopyExternalRepresentation(publicKey, &error) as Data? else {
@@ -86,6 +96,7 @@ enum VaultCryptoService {
         return data
     }
 
+    /// SPKI DER → SecKey 公钥。
     static func importPublicKeySPKI(_ data: Data) throws -> SecKey {
         let attributes: [String: Any] = [
             kSecAttrKeyType as String: kSecAttrKeyTypeRSA,
@@ -99,6 +110,7 @@ enum VaultCryptoService {
         return key
     }
 
+    /// 私钥导出 PKCS#1 DER（再交给 AES 加密存盘）。
     static func exportPrivateKeyDER(_ privateKey: SecKey) throws -> Data {
         var error: Unmanaged<CFError>?
         guard let data = SecKeyCopyExternalRepresentation(privateKey, &error) as Data? else {
@@ -107,6 +119,7 @@ enum VaultCryptoService {
         return data
     }
 
+    /// DER → SecKey 私钥（解锁后用于解密记录）。
     static func importPrivateKeyDER(_ data: Data) throws -> SecKey {
         let attributes: [String: Any] = [
             kSecAttrKeyType as String: kSecAttrKeyTypeRSA,
@@ -120,8 +133,9 @@ enum VaultCryptoService {
         return key
     }
 
-    // MARK: - AES-GCM（与扩展一致：12 字节 IV，tag 128 bit，密文区为 ciphertext||tag）
+    // MARK: - AES-GCM（CryptoKit）
 
+    /// 加密：返回 12 字节 IV + 密文与 16 字节 tag 拼接。
     static func aesGcmEncrypt(plain: Data, key: SymmetricKey) throws -> (iv: Data, ciphertextWithTag: Data) {
         let iv = try randomBytes(aesIVLength)
         let nonce = try AES.GCM.Nonce(data: iv)
@@ -132,6 +146,7 @@ enum VaultCryptoService {
         return (iv, out)
     }
 
+    /// 解密：从 ciphertextWithTag 尾部取 tag，前面是密文。
     static func aesGcmDecrypt(iv: Data, ciphertextWithTag: Data, key: SymmetricKey) throws -> Data {
         guard ciphertextWithTag.count >= 16 else { throw VaultCryptoError.decryptFailed }
         let tag = ciphertextWithTag.suffix(16)
@@ -140,12 +155,14 @@ enum VaultCryptoService {
         return try AES.GCM.open(box, using: key)
     }
 
+    /// 用「密码派生密钥」加密 PKCS#8/PKCS#1 私钥 DER，得到可 JSON 存储的 blob。
     static func encryptPrivateKeyWithPassword(privateKey: SecKey, passwordKey: SymmetricKey) throws -> VaultEncryptedBlob {
         let pk = try exportPrivateKeyDER(privateKey)
         let (iv, ct) = try aesGcmEncrypt(plain: pk, key: passwordKey)
         return VaultEncryptedBlob(iv: iv.base64EncodedString(), ciphertext: ct.base64EncodedString())
     }
 
+    /// 解密私钥 blob → SecKey。
     static func decryptPrivateKeyWithPassword(blob: VaultEncryptedBlob, passwordKey: SymmetricKey) throws -> SecKey {
         guard let iv = Data(base64Encoded: blob.iv), let ct = Data(base64Encoded: blob.ciphertext) else {
             throw VaultCryptoError.invalidInput
@@ -154,14 +171,15 @@ enum VaultCryptoService {
         return try importPrivateKeyDER(der)
     }
 
-    // MARK: - 单条记录（对应 encryptRecordWithPublicKey / decryptRecordWithPrivateKey）
+    // MARK: - 单条历史记录（混合加密）
 
-    /// 供后台任务使用：只传 SPKI DER，避免在并发域之间传递 `SecKey`。
+    /// 后台加密入口：入参只用 SPKI 的 Data，避免 Sendable/隔离问题。
     static func encryptRecord(spkiDER: Data, payload: VaultPayload) throws -> VaultRecordEncoded {
         let pub = try importPublicKeySPKI(spkiDER)
         return try encryptRecord(payload: payload, publicKey: pub)
     }
 
+    /// 随机 AES 密钥加密 payload JSON；再用 RSA-OAEP-SHA256 加密该 AES 密钥。
     static func encryptRecord(payload: VaultPayload, publicKey: SecKey) throws -> VaultRecordEncoded {
         let encoder = JSONEncoder()
         encoder.outputFormatting = []
@@ -176,6 +194,7 @@ enum VaultCryptoService {
         return VaultRecordEncoded(iv: iv, ciphertext: ciphertextWithTag, encryptedAesKey: encKey)
     }
 
+    /// RSA 解出 AES 密钥 → AES-GCM 解 payload。
     static func decryptRecord(encoded: VaultRecordEncoded, privateKey: SecKey) throws -> VaultPayload {
         var err: Unmanaged<CFError>?
         guard let aesRaw = SecKeyCreateDecryptedData(privateKey, .rsaEncryptionOAEPSHA256, encoded.encryptedAesKey as CFData, &err) as Data? else {
@@ -186,7 +205,7 @@ enum VaultCryptoService {
         return try JSONDecoder().decode(VaultPayload.self, from: json)
     }
 
-    /// 首次设置保险库：盐 + RSA + 加密私钥
+    /// 用户首次设置密码：生成盐、RSA 对、加密私钥，得到可保存的 VaultMetaFile。
     static func createVaultMeta(password: String) throws -> VaultMetaFile {
         guard password.count >= 8, password.count <= 16 else { throw VaultCryptoError.invalidInput }
         let salt = try randomBytes(saltLength)
@@ -201,11 +220,13 @@ enum VaultCryptoService {
         )
     }
 
+    /// 从 meta 解析公钥（写加密记录时用）。
     static func loadPublicKey(from meta: VaultMetaFile) throws -> SecKey {
         guard let d = Data(base64Encoded: meta.publicKeySPKI) else { throw VaultCryptoError.invalidInput }
         return try importPublicKeySPKI(d)
     }
 
+    /// 用户输入密码 → 派生密钥 → 解密私钥。
     static func unlockPrivateKey(meta: VaultMetaFile, password: String) throws -> SecKey {
         guard let salt = Data(base64Encoded: meta.salt) else { throw VaultCryptoError.invalidInput }
         let passwordKey = try derivePasswordSymmetricKey(password: password, salt: salt)
