@@ -24,6 +24,12 @@ struct VaultHistorySheet: View {
             }
             .navigationTitle("无痕加密历史")
             .navigationBarTitleDisplayMode(.inline)
+            .onChange(of: viewModel.vaultUnlocked) { _, unlocked in
+                if !unlocked {
+                    unlockPassword = ""
+                    errorMessage = ""
+                }
+            }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("关闭") { dismiss() }

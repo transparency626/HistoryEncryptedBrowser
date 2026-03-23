@@ -2,6 +2,7 @@ import SwiftUI
 
 /// View 层：只负责展示与交互绑定，不包含地址解析或 WebKit 细节。
 struct BrowserView: View {
+    @Environment(\.scenePhase) private var scenePhase
     @StateObject private var viewModel = BrowserViewModel()
     @FocusState private var addressFocused: Bool
     @State private var showNormalHistory = false
@@ -50,6 +51,12 @@ struct BrowserView: View {
         .onChange(of: viewModel.isLoading) { _, loading in
             if !loading {
                 viewModel.syncAddressBarFromWebIfNeeded(addressFieldFocused: addressFocused)
+            }
+        }
+        .onChange(of: scenePhase) { _, phase in
+            // 离开前台即锁定保险库（含切应用、上滑回主屏幕、多任务界面），避免回到前台仍显示解密列表。
+            if phase != .active {
+                viewModel.lockVault()
             }
         }
         .sheet(isPresented: $showNormalHistory) {
