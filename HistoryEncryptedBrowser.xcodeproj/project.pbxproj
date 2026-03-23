@@ -14,6 +14,16 @@
 		A0B0C0D0E0F1011121314155 /* BrowserViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0B0C0D0E0F1011121314155 /* BrowserViewModel.swift */; };
 		A0B0C0D0E0F1011121314156 /* BrowserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0B0C0D0E0F1011121314156 /* BrowserView.swift */; };
 		A0B0C0D0E0F1011121314157 /* BrowserWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0B0C0D0E0F1011121314157 /* BrowserWebView.swift */; };
+		A0B0C0D0E0F1011121314BB1 /* URLHistoryNormalize.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0B0C0D0E0F1011121314BB1 /* URLHistoryNormalize.swift */; };
+		A0B0C0D0E0F1011121314BB2 /* VaultTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0B0C0D0E0F1011121314BB2 /* VaultTypes.swift */; };
+		A0B0C0D0E0F1011121314BB3 /* VaultCryptoService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0B0C0D0E0F1011121314BB3 /* VaultCryptoService.swift */; };
+		A0B0C0D0E0F1011121314BB4 /* IncognitoVaultStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0B0C0D0E0F1011121314BB4 /* IncognitoVaultStore.swift */; };
+		A0B0C0D0E0F1011121314BB5 /* PrivateHistoryRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0B0C0D0E0F1011121314BB5 /* PrivateHistoryRecorder.swift */; };
+		A0B0C0D0E0F1011121314BB6 /* VaultHistorySheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0B0C0D0E0F1011121314BB6 /* VaultHistorySheet.swift */; };
+		A0B0C0D0E0F1011121314BC1 /* BrowsingMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0B0C0D0E0F1011121314BC1 /* BrowsingMode.swift */; };
+		A0B0C0D0E0F1011121314BC2 /* PlainHistoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0B0C0D0E0F1011121314BC2 /* PlainHistoryStore.swift */; };
+		A0B0C0D0E0F1011121314BC3 /* NormalHistoryRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0B0C0D0E0F1011121314BC3 /* NormalHistoryRecorder.swift */; };
+		A0B0C0D0E0F1011121314BC4 /* NormalHistorySheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0B0C0D0E0F1011121314BC4 /* NormalHistorySheet.swift */; };
 		A0B0C0D0E0F1011121314158 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B0B0C0D0E0F1011121314158 /* Assets.xcassets */; };
 		A0B0C0D0E0F1011121314159 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B0B0C0D0E0F1011121314159 /* WebKit.framework */; };
 /* End PBXBuildFile section */
@@ -29,6 +39,17 @@
 		B0B0C0D0E0F1011121314157 /* BrowserWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserWebView.swift; sourceTree = "<group>"; };
 		B0B0C0D0E0F1011121314158 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B0B0C0D0E0F1011121314159 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
+		B0B0C0D0E0F1011121314BB1 /* URLHistoryNormalize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLHistoryNormalize.swift; sourceTree = "<group>"; };
+		B0B0C0D0E0F1011121314BB2 /* VaultTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VaultTypes.swift; sourceTree = "<group>"; };
+		B0B0C0D0E0F1011121314BB3 /* VaultCryptoService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VaultCryptoService.swift; sourceTree = "<group>"; };
+		B0B0C0D0E0F1011121314BB4 /* IncognitoVaultStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IncognitoVaultStore.swift; sourceTree = "<group>"; };
+		B0B0C0D0E0F1011121314BB5 /* PrivateHistoryRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivateHistoryRecorder.swift; sourceTree = "<group>"; };
+		B0B0C0D0E0F1011121314BB6 /* VaultHistorySheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VaultHistorySheet.swift; sourceTree = "<group>"; };
+		B0B0C0D0E0F1011121314BC1 /* BrowsingMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowsingMode.swift; sourceTree = "<group>"; };
+		B0B0C0D0E0F1011121314BC2 /* PlainHistoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlainHistoryStore.swift; sourceTree = "<group>"; };
+		B0B0C0D0E0F1011121314BC3 /* NormalHistoryRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NormalHistoryRecorder.swift; sourceTree = "<group>"; };
+		B0B0C0D0E0F1011121314BC4 /* NormalHistorySheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NormalHistorySheet.swift; sourceTree = "<group>"; };
+		B0B0C0D0E0F1011121314BB7 /* HistoryEncryptedBrowser-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "HistoryEncryptedBrowser-Bridging-Header.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,6 +87,7 @@
 				D0B0C0D0E0F1011121314156 /* Model */,
 				D0B0C0D0E0F1011121314157 /* ViewModel */,
 				D0B0C0D0E0F1011121314158 /* View */,
+				B0B0C0D0E0F1011121314BB7 /* HistoryEncryptedBrowser-Bridging-Header.h */,
 				B0B0C0D0E0F1011121314158 /* Assets.xcassets */,
 			);
 			path = HistoryEncryptedBrowser;
@@ -84,6 +106,14 @@
 			children = (
 				B0B0C0D0E0F1011121314152 /* BrowserNavigationSnapshot.swift */,
 				B0B0C0D0E0F1011121314153 /* AddressResolving.swift */,
+				B0B0C0D0E0F1011121314BB1 /* URLHistoryNormalize.swift */,
+				B0B0C0D0E0F1011121314BB2 /* VaultTypes.swift */,
+				B0B0C0D0E0F1011121314BB3 /* VaultCryptoService.swift */,
+				B0B0C0D0E0F1011121314BB4 /* IncognitoVaultStore.swift */,
+				B0B0C0D0E0F1011121314BB5 /* PrivateHistoryRecorder.swift */,
+				B0B0C0D0E0F1011121314BC1 /* BrowsingMode.swift */,
+				B0B0C0D0E0F1011121314BC2 /* PlainHistoryStore.swift */,
+				B0B0C0D0E0F1011121314BC3 /* NormalHistoryRecorder.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -102,6 +132,8 @@
 			children = (
 				B0B0C0D0E0F1011121314156 /* BrowserView.swift */,
 				B0B0C0D0E0F1011121314157 /* BrowserWebView.swift */,
+				B0B0C0D0E0F1011121314BB6 /* VaultHistorySheet.swift */,
+				B0B0C0D0E0F1011121314BC4 /* NormalHistorySheet.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -182,6 +214,16 @@
 				A0B0C0D0E0F1011121314155 /* BrowserViewModel.swift in Sources */,
 				A0B0C0D0E0F1011121314156 /* BrowserView.swift in Sources */,
 				A0B0C0D0E0F1011121314157 /* BrowserWebView.swift in Sources */,
+				A0B0C0D0E0F1011121314BB1 /* URLHistoryNormalize.swift in Sources */,
+				A0B0C0D0E0F1011121314BB2 /* VaultTypes.swift in Sources */,
+				A0B0C0D0E0F1011121314BB3 /* VaultCryptoService.swift in Sources */,
+				A0B0C0D0E0F1011121314BB4 /* IncognitoVaultStore.swift in Sources */,
+				A0B0C0D0E0F1011121314BB5 /* PrivateHistoryRecorder.swift in Sources */,
+				A0B0C0D0E0F1011121314BB6 /* VaultHistorySheet.swift in Sources */,
+				A0B0C0D0E0F1011121314BC1 /* BrowsingMode.swift in Sources */,
+				A0B0C0D0E0F1011121314BC2 /* PlainHistoryStore.swift in Sources */,
+				A0B0C0D0E0F1011121314BC3 /* NormalHistoryRecorder.swift in Sources */,
+				A0B0C0D0E0F1011121314BC4 /* NormalHistorySheet.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -334,6 +376,7 @@
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "HistoryEncryptedBrowser/HistoryEncryptedBrowser-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -366,6 +409,7 @@
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "HistoryEncryptedBrowser/HistoryEncryptedBrowser-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

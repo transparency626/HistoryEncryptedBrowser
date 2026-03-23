@@ -4,6 +4,8 @@ import SwiftUI
 struct BrowserView: View {
     @StateObject private var viewModel = BrowserViewModel()
     @FocusState private var addressFocused: Bool
+    @State private var showNormalHistory = false
+    @State private var showVaultHistory = false
 
     private var showsWelcome: Bool {
         let u = viewModel.locationDisplay
@@ -24,9 +26,11 @@ struct BrowserView: View {
 
             VStack(spacing: 0) {
                 addressChrome
+                browsingModePicker
 
                 ZStack {
                     BrowserWebView(viewModel: viewModel)
+                        .id(viewModel.browsingMode)
 
                     if showsWelcome {
                         welcomeOverlay
@@ -47,6 +51,12 @@ struct BrowserView: View {
             if !loading {
                 viewModel.syncAddressBarFromWebIfNeeded(addressFieldFocused: addressFocused)
             }
+        }
+        .sheet(isPresented: $showNormalHistory) {
+            NormalHistorySheet(viewModel: viewModel)
+        }
+        .sheet(isPresented: $showVaultHistory) {
+            VaultHistorySheet(viewModel: viewModel)
         }
     }
 
@@ -96,6 +106,20 @@ struct BrowserView: View {
         .padding(.bottom, 10)
     }
 
+    private var browsingModePicker: some View {
+        Picker("", selection: Binding(
+            get: { viewModel.browsingMode },
+            set: { viewModel.setBrowsingMode($0) }
+        )) {
+            ForEach(BrowsingMode.allCases) { mode in
+                Text(mode.shortTitle).tag(mode)
+            }
+        }
+        .pickerStyle(.segmented)
+        .padding(.horizontal, 16)
+        .padding(.bottom, 8)
+    }
+
     private var progressBar: some View {
         GeometryReader { geo in
             Rectangle()
@@ -109,17 +133,21 @@ struct BrowserView: View {
 
     private var welcomeOverlay: some View {
         VStack(spacing: 10) {
-            Image(systemName: "leaf.fill")
+            Image(systemName: viewModel.browsingMode == .incognito ? "eye.slash.fill" : "globe.americas.fill")
                 .font(.system(size: 36, weight: .medium))
                 .foregroundStyle(.secondary)
-            Text("私密浏览")
+            Text(viewModel.browsingMode == .incognito ? "无痕浏览" : "普通浏览")
                 .font(.title2.weight(.semibold))
                 .foregroundStyle(.primary)
-            Text("不写入系统网站数据；关闭应用后不留痕迹。\n在上方输入关键词或完整网址即可开始。")
-                .font(.footnote)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 28)
+            Text(
+                viewModel.browsingMode == .incognito
+                    ? "不持久保存 Cookie 与站点数据；访问记录可加密写入保险库（底部锁图标，需先设密码）。"
+                    : "站点数据会持久保存；浏览历史为明文列表（底部时钟图标），与无痕加密库互不混用。"
+            )
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+            .multilineTextAlignment(.center)
+            .padding(.horizontal, 28)
         }
         .padding(.bottom, 40)
     }
@@ -133,6 +161,30 @@ struct BrowserView: View {
                 viewModel.goForward()
             }
             Spacer(minLength: 0)
+            if viewModel.browsingMode == .normal {
+                Button {
+                    showNormalHistory = true
+                } label: {
+                    Image(systemName: "clock.arrow.circlepath")
+                        .font(.body.weight(.semibold))
+                        .frame(width: 44, height: 44)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("浏览历史")
+            } else {
+                Button {
+                    showVaultHistory = true
+                } label: {
+                    Image(systemName: "lock.rectangle.stack")
+                        .font(.body.weight(.semibold))
+                        .frame(width: 44, height: 44)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("无痕加密历史")
+            }
+
             Button {
                 viewModel.reloadOrStop()
             } label: {

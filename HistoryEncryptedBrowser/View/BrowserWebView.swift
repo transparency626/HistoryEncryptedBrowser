@@ -11,7 +11,12 @@ struct BrowserWebView: UIViewRepresentable {
 
     func makeUIView(context: Context) -> WKWebView {
         let config = WKWebViewConfiguration()
-        config.websiteDataStore = .nonPersistent()
+        switch viewModel.browsingMode {
+        case .normal:
+            config.websiteDataStore = .default()
+        case .incognito:
+            config.websiteDataStore = .nonPersistent()
+        }
         config.defaultWebpagePreferences.allowsContentJavaScript = true
 
         let webView = WKWebView(frame: .zero, configuration: config)
@@ -21,6 +26,7 @@ struct BrowserWebView: UIViewRepresentable {
         webView.scrollView.keyboardDismissMode = .onDrag
 
         context.coordinator.observeProgress(webView: webView)
+        context.coordinator.observeTitle(webView: webView)
         context.coordinator.bind(webView: webView)
 
         viewModel.attachNavigationDriver(context.coordinator)
@@ -42,6 +48,7 @@ struct BrowserWebView: UIViewRepresentable {
         /// 在 `didCommit` 之前 `webView.url` 常仍为上一页；失败时也可能回到 `about:blank`，用于地址栏与快照一致。
         private var lastRequestedURL: URL?
         private var progressObservation: NSKeyValueObservation?
+        private var titleObservation: NSKeyValueObservation?
 
         init(viewModel: BrowserViewModel) {
             self.viewModel = viewModel
@@ -54,9 +61,11 @@ struct BrowserWebView: UIViewRepresentable {
         func unbind() {
             progressObservation?.invalidate()
             progressObservation = nil
+            titleObservation?.invalidate()
+            titleObservation = nil
             webView?.navigationDelegate = nil
             webView?.uiDelegate = nil
-            viewModel?.detachNavigationDriver()
+            viewModel?.detachNavigationDriver(self)
             lastRequestedURL = nil
             webView = nil
             viewModel = nil
@@ -66,6 +75,16 @@ struct BrowserWebView: UIViewRepresentable {
             progressObservation = webView.observe(\.estimatedProgress, options: [.new]) { [weak self] wv, _ in
                 Task { @MainActor in
                     self?.viewModel?.handleEstimatedProgress(wv.estimatedProgress)
+                }
+            }
+        }
+
+        /// 对应扩展 `chrome.tabs.onUpdated` 的 `title` 分支（无痕下删旧记录再加密写入新标题）。
+        func observeTitle(webView: WKWebView) {
+            titleObservation = webView.observe(\.title, options: [.new]) { [weak self] wv, _ in
+                Task { @MainActor in
+                    guard let urlStr = wv.url?.absoluteString else { return }
+                    self?.viewModel?.browserHistoryOnTitleChange(url: urlStr, title: wv.title ?? "")
                 }
             }
         }
