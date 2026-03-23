@@ -9,10 +9,10 @@ struct NormalHistorySheet: View {
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-        NavigationStack {
-            Group {
+        NavigationStack {   //提供标题栏、toolbar，可内嵌导航
+            Group {   //本身不产生视觉，只是包住 if/else 多个分支。
                 // 没有任何记录：不显示空 List，用系统占位更友好。
-                if viewModel.normalHistoryEntries.isEmpty {
+                if viewModel.normalHistoryEntries.isEmpty { 
                     ContentUnavailableView(
                         "暂无浏览记录",
                         systemImage: "clock.arrow.circlepath",
