@@ -13,6 +13,8 @@ struct BrowserView: View {
     @State private var showNormalHistory = false
     // 控制「无痕加密历史」半屏是否弹出。
     @State private var showVaultHistory = false
+    // 控制「收藏夹」列表 sheet。
+    @State private var showBookmarks = false
 
     /// 是否在 Web 区域上叠一层欢迎文案（空白页且没在转圈时）。
     private var showsWelcome: Bool {
@@ -92,6 +94,9 @@ struct BrowserView: View {
         }
         .sheet(isPresented: $showVaultHistory) {
             VaultHistorySheet(viewModel: viewModel)
+        }
+        .sheet(isPresented: $showBookmarks) {
+            BookmarksSheet(viewModel: viewModel)
         }
     }
 
@@ -204,7 +209,7 @@ struct BrowserView: View {
             Text(
                 viewModel.browsingMode == .incognito
                     ? "不持久保存 Cookie 与站点数据；访问记录可加密写入保险库（底部锁图标，需先设密码）。"
-                    : "站点数据会持久保存；浏览历史为明文列表（底部时钟图标），与无痕加密库互不混用。"
+                    : "站点数据会持久保存；浏览历史（时钟）与收藏夹（星标/书本）均为明文保存，与无痕加密库互不混用。"
             )
             .font(.footnote)
             .foregroundStyle(.secondary)
@@ -253,6 +258,32 @@ struct BrowserView: View {
                 .buttonStyle(.plain)
                 .accessibilityLabel("无痕加密历史")
             }
+
+            // 星标：当前为 http(s) 页时可点；已收藏为实心星，再点取消收藏。
+            Button {
+                viewModel.toggleBookmarkForCurrentPage()
+            } label: {
+                Image(systemName: viewModel.isCurrentPageBookmarked ? "star.fill" : "star")
+                    .font(.body.weight(.semibold))
+                    .frame(width: 44, height: 44)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .disabled(shareURL == nil)
+            .opacity(shareURL == nil ? 0.35 : 1)
+            .accessibilityLabel(viewModel.isCurrentPageBookmarked ? "取消收藏" : "收藏本页")
+
+            // 打开收藏夹列表（与历史一样明文存盘）。
+            Button {
+                showBookmarks = true
+            } label: {
+                Image(systemName: "book.closed")
+                    .font(.body.weight(.semibold))
+                    .frame(width: 44, height: 44)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("收藏夹")
 
             // 加载中显示停止，否则显示刷新。
             Button {

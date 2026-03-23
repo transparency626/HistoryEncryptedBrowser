@@ -29,6 +29,9 @@ final class BrowserViewModel: ObservableObject {
     /// 明文历史列表数据（打开「浏览历史」 sheet 时刷新）。
     @Published private(set) var normalHistoryEntries: [NormalHistoryEntry] = []
 
+    /// 收藏夹列表（明文 JSON，与历史同目录不同文件）。
+    @Published private(set) var bookmarkEntries: [BookmarkEntry] = []
+
     // MARK: - 保险库（无痕加密）
 
     /// 磁盘上是否已有 meta（有则无痕可写加密记录）。
@@ -44,6 +47,8 @@ final class BrowserViewModel: ObservableObject {
     private let vaultStore: IncognitoVaultStore
     /// 普通明文历史存储。
     private let plainHistoryStore: PlainHistoryStore
+    /// 收藏夹存储。
+    private let bookmarksStore: BookmarksStore
     /// 无痕侧记录器。
     private let privateRecorder: PrivateHistoryRecorder
     /// 普通侧记录器。
@@ -66,9 +71,11 @@ final class BrowserViewModel: ObservableObject {
         let plain = PlainHistoryStore()
         self.vaultStore = store
         self.plainHistoryStore = plain
+        self.bookmarksStore = BookmarksStore()
         self.privateRecorder = PrivateHistoryRecorder(store: store)
         self.normalRecorder = NormalHistoryRecorder(store: plain)
         self.vaultMetaPresent = store.loadMeta() != nil
+        refreshBookmarksList()
     }
 
     /// 切换普通/无痕：清理对方内存去重、重置导航快照（WebView 由 View 层 .id 重建）。
@@ -110,6 +117,72 @@ final class BrowserViewModel: ObservableObject {
         guard let u = URL(string: item.url) else { return }
         addressBar = item.url
         navigationDriver?.load(url: u)
+    }
+
+    // MARK: - 收藏夹（明文，与历史相同存储方式）
+
+    func refreshBookmarksList() {
+        bookmarkEntries = bookmarksStore.loadAllSortedNewestFirst()
+    }
+
+    /// 打开收藏夹时：若当前停留页正好有一条「标题仍空或实为 URL」的收藏，再尝试用 JS 补一次。
+    func tryRefreshBookmarkTitleForCurrentPageIfNeeded() {
+        let u = locationDisplay
+        guard shouldRecordHistoryURL(u) else { return }
+        let norm = URLHistoryNormalize.normalizeUrlForDedup(u)
+        guard let entry = bookmarkEntries.first(where: { URLHistoryNormalize.normalizeUrlForDedup($0.url) == norm }) else { return }
+        if sanitizedBookmarkTitle(entry.title, pageURL: u).isEmpty {
+            tryFillBookmarkTitleViaJS(pageURL: u, retryCount: 0)
+        }
+    }
+
+    /// 当前页是否已在收藏夹（按 URL 规范化比较）。
+    var isCurrentPageBookmarked: Bool {
+        let u = locationDisplay
+        guard shouldRecordHistoryURL(u) else { return false }
+        let norm = URLHistoryNormalize.normalizeUrlForDedup(u)
+        return bookmarkEntries.contains { URLHistoryNormalize.normalizeUrlForDedup($0.url) == norm }
+    }
+
+    /// 有可加书签的页面时：已收藏则移除，未收藏则写入。标题经 `sanitizedBookmarkTitle` 过滤；仍为空时用 JS 读 `document.title` / og 标签并短延迟重试。
+    func toggleBookmarkForCurrentPage() {
+        let u = locationDisplay
+        guard shouldRecordHistoryURL(u) else { return }
+        let norm = URLHistoryNormalize.normalizeUrlForDedup(u)
+        let already = bookmarkEntries.contains { URLHistoryNormalize.normalizeUrlForDedup($0.url) == norm }
+        var needJSTitle = false
+        if already {
+            try? bookmarksStore.removeMatchingNormalizedURL(u)
+        } else {
+            let raw = pageTitle.trimmingCharacters(in: .whitespacesAndNewlines)
+            let title = sanitizedBookmarkTitle(raw, pageURL: u)
+            let now = Int64(Date().timeIntervalSince1970 * 1000)
+            try? bookmarksStore.upsert(url: u, title: title, favIconUrl: "", time: now)
+            needJSTitle = title.isEmpty
+        }
+        refreshBookmarksList()
+        if needJSTitle {
+            tryFillBookmarkTitleViaJS(pageURL: u, retryCount: 0)
+        }
+    }
+
+    func deleteBookmarkItems(at offsets: IndexSet) {
+        let snap = bookmarkEntries
+        for i in offsets where snap.indices.contains(i) {
+            try? bookmarksStore.deleteRecord(id: snap[i].id)
+        }
+        refreshBookmarksList()
+    }
+
+    func clearBookmarks() {
+        try? bookmarksStore.clearAll()
+        refreshBookmarksList()
+    }
+
+    func openBookmarkEntry(_ item: BookmarkEntry) {
+        guard let url = URL(string: item.url) else { return }
+        addressBar = item.url
+        navigationDriver?.load(url: url)
     }
 
     /// WebView 创建时由 Coordinator 注册。
@@ -252,6 +325,8 @@ final class BrowserViewModel: ObservableObject {
         case .incognito:
             privateRecorder.onWebNavigationCompleted(url: url, title: title, favIconUrl: "")
         }
+        // 与历史同源：主文档完成时用当前 `title` 更新已收藏条目的显示标题（不改动收藏时间）。
+        syncBookmarkTitleWithPage(url: url, title: title)
     }
 
     /// 标题变化：同样按模式分流。
@@ -266,6 +341,57 @@ final class BrowserViewModel: ObservableObject {
             normalRecorder.onTitleUpdated(url: url, title: title, favIconUrl: "")
         case .incognito:
             privateRecorder.onTitleUpdated(url: url, title: title, favIconUrl: "")
+        }
+        // 与历史里 `onTitleUpdated` 一致：页面标题 KVO 更新时，同步改收藏夹里同 URL 的标题。
+        syncBookmarkTitleWithPage(url: url, title: title)
+    }
+
+    /// 若该页已在收藏夹：写入经净化的标题；净化后仍空（含 WK 把 URL 当 title）则走 JS 补全。
+    private func syncBookmarkTitleWithPage(url: String, title: String) {
+        let norm = URLHistoryNormalize.normalizeUrlForDedup(url)
+        guard bookmarkEntries.contains(where: { URLHistoryNormalize.normalizeUrlForDedup($0.url) == norm }) else { return }
+        let clean = sanitizedBookmarkTitle(title, pageURL: url)
+        if !clean.isEmpty {
+            try? bookmarksStore.updateTitleIfBookmarked(pageURL: url, title: clean)
+            refreshBookmarksList()
+        } else {
+            tryFillBookmarkTitleViaJS(pageURL: url, retryCount: 0)
+        }
+    }
+
+    /// 去掉「整串就是 URL」的假标题，避免列表里出现一长串 https://…
+    private func sanitizedBookmarkTitle(_ raw: String, pageURL: String) -> String {
+        let t = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        if t.isEmpty { return "" }
+        if t == pageURL { return "" }
+        let nu = URLHistoryNormalize.normalizeUrlForDedup(pageURL)
+        let nt = URLHistoryNormalize.normalizeUrlForDedup(t)
+        if nu == nt { return "" }
+        let lower = t.lowercased()
+        if lower.hasPrefix("http://") || lower.hasPrefix("https://") { return "" }
+        return t
+    }
+
+    /// 用当前 WebView 执行 JS 取标题；失败或仍无效时最多再延迟重试 2 次（SPA 晚写入 `document.title`）。
+    private func tryFillBookmarkTitleViaJS(pageURL: String, retryCount: Int) {
+        navigationDriver?.fetchDocumentTitle { [weak self] raw in
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                let norm = URLHistoryNormalize.normalizeUrlForDedup(pageURL)
+                guard self.bookmarkEntries.contains(where: { URLHistoryNormalize.normalizeUrlForDedup($0.url) == norm }) else { return }
+                let clean = raw.map { self.sanitizedBookmarkTitle($0, pageURL: pageURL) } ?? ""
+                if !clean.isEmpty {
+                    try? self.bookmarksStore.updateTitleIfBookmarked(pageURL: pageURL, title: clean)
+                    self.refreshBookmarksList()
+                    return
+                }
+                if retryCount < 2 {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) { [weak self] in
+                        guard let self else { return }
+                        self.tryFillBookmarkTitleViaJS(pageURL: pageURL, retryCount: retryCount + 1)
+                    }
+                }
+            }
         }
     }
 

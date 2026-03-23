@@ -24,6 +24,8 @@
 		A0B0C0D0E0F1011121314BC2 /* PlainHistoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0B0C0D0E0F1011121314BC2 /* PlainHistoryStore.swift */; };
 		A0B0C0D0E0F1011121314BC3 /* NormalHistoryRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0B0C0D0E0F1011121314BC3 /* NormalHistoryRecorder.swift */; };
 		A0B0C0D0E0F1011121314BC4 /* NormalHistorySheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0B0C0D0E0F1011121314BC4 /* NormalHistorySheet.swift */; };
+		A0B0C0D0E0F1011121314BC5 /* BookmarksStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0B0C0D0E0F1011121314BC5 /* BookmarksStore.swift */; };
+		A0B0C0D0E0F1011121314BC6 /* BookmarksSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0B0C0D0E0F1011121314BC6 /* BookmarksSheet.swift */; };
 		A0B0C0D0E0F1011121314158 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B0B0C0D0E0F1011121314158 /* Assets.xcassets */; };
 		A0B0C0D0E0F1011121314159 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B0B0C0D0E0F1011121314159 /* WebKit.framework */; };
 /* End PBXBuildFile section */
@@ -49,6 +51,8 @@
 		B0B0C0D0E0F1011121314BC2 /* PlainHistoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlainHistoryStore.swift; sourceTree = "<group>"; };
 		B0B0C0D0E0F1011121314BC3 /* NormalHistoryRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NormalHistoryRecorder.swift; sourceTree = "<group>"; };
 		B0B0C0D0E0F1011121314BC4 /* NormalHistorySheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NormalHistorySheet.swift; sourceTree = "<group>"; };
+		B0B0C0D0E0F1011121314BC5 /* BookmarksStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksStore.swift; sourceTree = "<group>"; };
+		B0B0C0D0E0F1011121314BC6 /* BookmarksSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksSheet.swift; sourceTree = "<group>"; };
 		B0B0C0D0E0F1011121314BB7 /* HistoryEncryptedBrowser-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "HistoryEncryptedBrowser-Bridging-Header.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -114,6 +118,7 @@
 				B0B0C0D0E0F1011121314BC1 /* BrowsingMode.swift */,
 				B0B0C0D0E0F1011121314BC2 /* PlainHistoryStore.swift */,
 				B0B0C0D0E0F1011121314BC3 /* NormalHistoryRecorder.swift */,
+				B0B0C0D0E0F1011121314BC5 /* BookmarksStore.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -134,6 +139,7 @@
 				B0B0C0D0E0F1011121314157 /* BrowserWebView.swift */,
 				B0B0C0D0E0F1011121314BB6 /* VaultHistorySheet.swift */,
 				B0B0C0D0E0F1011121314BC4 /* NormalHistorySheet.swift */,
+				B0B0C0D0E0F1011121314BC6 /* BookmarksSheet.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -224,6 +230,8 @@
 				A0B0C0D0E0F1011121314BC2 /* PlainHistoryStore.swift in Sources */,
 				A0B0C0D0E0F1011121314BC3 /* NormalHistoryRecorder.swift in Sources */,
 				A0B0C0D0E0F1011121314BC4 /* NormalHistorySheet.swift in Sources */,
+				A0B0C0D0E0F1011121314BC5 /* BookmarksStore.swift in Sources */,
+				A0B0C0D0E0F1011121314BC6 /* BookmarksSheet.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

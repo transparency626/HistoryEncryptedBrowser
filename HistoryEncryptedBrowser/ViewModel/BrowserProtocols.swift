@@ -13,6 +13,8 @@ protocol BrowserNavigationDriver: AnyObject {
     func reload()
     /// 停止当前加载。
     func stopLoading()
+    /// 从当前已加载文档读取标题（`document.title`，失败再用 og/twitter meta）；用于 KVO 尚未就绪或 `title` 为空时补收藏夹。
+    func fetchDocumentTitle(completion: @escaping (String?) -> Void)
 }
 
 /// Web 容器 → ViewModel：网页生命周期与进度回调。

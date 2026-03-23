@@ -161,6 +161,43 @@ struct BrowserWebView: UIViewRepresentable {
         func reload() { webView?.reload() }
         func stopLoading() { webView?.stopLoading() }
 
+        /// 与 KVO 的 `title` 互补：SPA/晚解析时 `document.title` 或 og 元数据可能更可靠。
+        func fetchDocumentTitle(completion: @escaping (String?) -> Void) {
+            guard let wv = webView else {
+                completion(nil)
+                return
+            }
+            wv.evaluateJavaScript(Self.bookmarkTitleJavaScript) { result, _ in
+                DispatchQueue.main.async {
+                    guard let s = result as? String else {
+                        completion(nil)
+                        return
+                    }
+                    let t = s.trimmingCharacters(in: .whitespacesAndNewlines)
+                    completion(t.isEmpty ? nil : t)
+                }
+            }
+        }
+
+        /// 取标题：`document.title` 若像 URL 则忽略，优先 `og:title` / `twitter:title`（不少站 KVO 阶段 title 仍是地址栏串）。
+        private static let bookmarkTitleJavaScript = """
+        (function(){
+          function pick(x){ if(x==null||x==='') return ''; return String(x).trim(); }
+          function looksLikeURL(s){ return /^https?:\\/\\//i.test(s); }
+          var og = document.querySelector('meta[property="og:title"]');
+          var ogt = pick(og && og.getAttribute('content'));
+          if (ogt && !looksLikeURL(ogt)) return ogt;
+          var tw = document.querySelector('meta[name="twitter:title"]');
+          var twt = pick(tw && tw.getAttribute('content'));
+          if (twt && !looksLikeURL(twt)) return twt;
+          var dt = pick(document.title);
+          if (dt && !looksLikeURL(dt)) return dt;
+          if (ogt) return ogt;
+          if (twt) return twt;
+          return dt || '';
+        })()
+        """
+
         // MARK: - WKNavigationDelegate（WebKit 调这些）
 
         func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
