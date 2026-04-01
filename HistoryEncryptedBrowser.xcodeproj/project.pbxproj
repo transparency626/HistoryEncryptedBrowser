@@ -8,24 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		A0B0C0D0E0F1011121314151 /* HistoryEncryptedBrowserApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0B0C0D0E0F1011121314151 /* HistoryEncryptedBrowserApp.swift */; };
-		A0B0C0D0E0F1011121314152 /* BrowserNavigationSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0B0C0D0E0F1011121314152 /* BrowserNavigationSnapshot.swift */; };
-		A0B0C0D0E0F1011121314153 /* AddressResolving.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0B0C0D0E0F1011121314153 /* AddressResolving.swift */; };
-		A0B0C0D0E0F1011121314154 /* BrowserProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0B0C0D0E0F1011121314154 /* BrowserProtocols.swift */; };
+		A0B0C0D0E0F1011121314DD1 /* BrowserNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0B0C0D0E0F1011121314DD1 /* BrowserNavigation.swift */; };
+		A0B0C0D0E0F1011121314DD3 /* PlainHistoryAndBookmarks.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0B0C0D0E0F1011121314DD3 /* PlainHistoryAndBookmarks.swift */; };
+		A0B0C0D0E0F1011121314DD4 /* BrowserSheets.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0B0C0D0E0F1011121314DD4 /* BrowserSheets.swift */; };
 		A0B0C0D0E0F1011121314155 /* BrowserViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0B0C0D0E0F1011121314155 /* BrowserViewModel.swift */; };
 		A0B0C0D0E0F1011121314156 /* BrowserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0B0C0D0E0F1011121314156 /* BrowserView.swift */; };
 		A0B0C0D0E0F1011121314157 /* BrowserWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0B0C0D0E0F1011121314157 /* BrowserWebView.swift */; };
-		A0B0C0D0E0F1011121314BB1 /* URLHistoryNormalize.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0B0C0D0E0F1011121314BB1 /* URLHistoryNormalize.swift */; };
-		A0B0C0D0E0F1011121314BB2 /* VaultTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0B0C0D0E0F1011121314BB2 /* VaultTypes.swift */; };
-		A0B0C0D0E0F1011121314BB3 /* VaultCryptoService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0B0C0D0E0F1011121314BB3 /* VaultCryptoService.swift */; };
-		A0B0C0D0E0F1011121314BB4 /* IncognitoVaultStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0B0C0D0E0F1011121314BB4 /* IncognitoVaultStore.swift */; };
-		A0B0C0D0E0F1011121314BB5 /* PrivateHistoryRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0B0C0D0E0F1011121314BB5 /* PrivateHistoryRecorder.swift */; };
-		A0B0C0D0E0F1011121314BB6 /* VaultHistorySheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0B0C0D0E0F1011121314BB6 /* VaultHistorySheet.swift */; };
-		A0B0C0D0E0F1011121314BC1 /* BrowsingMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0B0C0D0E0F1011121314BC1 /* BrowsingMode.swift */; };
-		A0B0C0D0E0F1011121314BC2 /* PlainHistoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0B0C0D0E0F1011121314BC2 /* PlainHistoryStore.swift */; };
-		A0B0C0D0E0F1011121314BC3 /* NormalHistoryRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0B0C0D0E0F1011121314BC3 /* NormalHistoryRecorder.swift */; };
-		A0B0C0D0E0F1011121314BC4 /* NormalHistorySheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0B0C0D0E0F1011121314BC4 /* NormalHistorySheet.swift */; };
-		A0B0C0D0E0F1011121314BC5 /* BookmarksStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0B0C0D0E0F1011121314BC5 /* BookmarksStore.swift */; };
-		A0B0C0D0E0F1011121314BC6 /* BookmarksSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0B0C0D0E0F1011121314BC6 /* BookmarksSheet.swift */; };
 		A0B0C0D0E0F1011121314158 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B0B0C0D0E0F1011121314158 /* Assets.xcassets */; };
 		A0B0C0D0E0F1011121314159 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B0B0C0D0E0F1011121314159 /* WebKit.framework */; };
 /* End PBXBuildFile section */
@@ -33,27 +21,14 @@
 /* Begin PBXFileReference section */
 		C0B0C0D0E0F1011121314151 /* HistoryEncryptedBrowser.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HistoryEncryptedBrowser.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B0B0C0D0E0F1011121314151 /* HistoryEncryptedBrowserApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryEncryptedBrowserApp.swift; sourceTree = "<group>"; };
-		B0B0C0D0E0F1011121314152 /* BrowserNavigationSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserNavigationSnapshot.swift; sourceTree = "<group>"; };
-		B0B0C0D0E0F1011121314153 /* AddressResolving.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressResolving.swift; sourceTree = "<group>"; };
-		B0B0C0D0E0F1011121314154 /* BrowserProtocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserProtocols.swift; sourceTree = "<group>"; };
+		B0B0C0D0E0F1011121314DD1 /* BrowserNavigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserNavigation.swift; sourceTree = "<group>"; };
+		B0B0C0D0E0F1011121314DD3 /* PlainHistoryAndBookmarks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlainHistoryAndBookmarks.swift; sourceTree = "<group>"; };
+		B0B0C0D0E0F1011121314DD4 /* BrowserSheets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserSheets.swift; sourceTree = "<group>"; };
 		B0B0C0D0E0F1011121314155 /* BrowserViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserViewModel.swift; sourceTree = "<group>"; };
 		B0B0C0D0E0F1011121314156 /* BrowserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserView.swift; sourceTree = "<group>"; };
 		B0B0C0D0E0F1011121314157 /* BrowserWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserWebView.swift; sourceTree = "<group>"; };
 		B0B0C0D0E0F1011121314158 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B0B0C0D0E0F1011121314159 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
-		B0B0C0D0E0F1011121314BB1 /* URLHistoryNormalize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLHistoryNormalize.swift; sourceTree = "<group>"; };
-		B0B0C0D0E0F1011121314BB2 /* VaultTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VaultTypes.swift; sourceTree = "<group>"; };
-		B0B0C0D0E0F1011121314BB3 /* VaultCryptoService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VaultCryptoService.swift; sourceTree = "<group>"; };
-		B0B0C0D0E0F1011121314BB4 /* IncognitoVaultStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IncognitoVaultStore.swift; sourceTree = "<group>"; };
-		B0B0C0D0E0F1011121314BB5 /* PrivateHistoryRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivateHistoryRecorder.swift; sourceTree = "<group>"; };
-		B0B0C0D0E0F1011121314BB6 /* VaultHistorySheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VaultHistorySheet.swift; sourceTree = "<group>"; };
-		B0B0C0D0E0F1011121314BC1 /* BrowsingMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowsingMode.swift; sourceTree = "<group>"; };
-		B0B0C0D0E0F1011121314BC2 /* PlainHistoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlainHistoryStore.swift; sourceTree = "<group>"; };
-		B0B0C0D0E0F1011121314BC3 /* NormalHistoryRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NormalHistoryRecorder.swift; sourceTree = "<group>"; };
-		B0B0C0D0E0F1011121314BC4 /* NormalHistorySheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NormalHistorySheet.swift; sourceTree = "<group>"; };
-		B0B0C0D0E0F1011121314BC5 /* BookmarksStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksStore.swift; sourceTree = "<group>"; };
-		B0B0C0D0E0F1011121314BC6 /* BookmarksSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksSheet.swift; sourceTree = "<group>"; };
-		B0B0C0D0E0F1011121314BB7 /* HistoryEncryptedBrowser-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "HistoryEncryptedBrowser-Bridging-Header.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -91,7 +66,6 @@
 				D0B0C0D0E0F1011121314156 /* Model */,
 				D0B0C0D0E0F1011121314157 /* ViewModel */,
 				D0B0C0D0E0F1011121314158 /* View */,
-				B0B0C0D0E0F1011121314BB7 /* HistoryEncryptedBrowser-Bridging-Header.h */,
 				B0B0C0D0E0F1011121314158 /* Assets.xcassets */,
 			);
 			path = HistoryEncryptedBrowser;
@@ -108,17 +82,8 @@
 		D0B0C0D0E0F1011121314156 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				B0B0C0D0E0F1011121314152 /* BrowserNavigationSnapshot.swift */,
-				B0B0C0D0E0F1011121314153 /* AddressResolving.swift */,
-				B0B0C0D0E0F1011121314BB1 /* URLHistoryNormalize.swift */,
-				B0B0C0D0E0F1011121314BB2 /* VaultTypes.swift */,
-				B0B0C0D0E0F1011121314BB3 /* VaultCryptoService.swift */,
-				B0B0C0D0E0F1011121314BB4 /* IncognitoVaultStore.swift */,
-				B0B0C0D0E0F1011121314BB5 /* PrivateHistoryRecorder.swift */,
-				B0B0C0D0E0F1011121314BC1 /* BrowsingMode.swift */,
-				B0B0C0D0E0F1011121314BC2 /* PlainHistoryStore.swift */,
-				B0B0C0D0E0F1011121314BC3 /* NormalHistoryRecorder.swift */,
-				B0B0C0D0E0F1011121314BC5 /* BookmarksStore.swift */,
+				B0B0C0D0E0F1011121314DD1 /* BrowserNavigation.swift */,
+				B0B0C0D0E0F1011121314DD3 /* PlainHistoryAndBookmarks.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -126,7 +91,6 @@
 		D0B0C0D0E0F1011121314157 /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
-				B0B0C0D0E0F1011121314154 /* BrowserProtocols.swift */,
 				B0B0C0D0E0F1011121314155 /* BrowserViewModel.swift */,
 			);
 			path = ViewModel;
@@ -137,9 +101,7 @@
 			children = (
 				B0B0C0D0E0F1011121314156 /* BrowserView.swift */,
 				B0B0C0D0E0F1011121314157 /* BrowserWebView.swift */,
-				B0B0C0D0E0F1011121314BB6 /* VaultHistorySheet.swift */,
-				B0B0C0D0E0F1011121314BC4 /* NormalHistorySheet.swift */,
-				B0B0C0D0E0F1011121314BC6 /* BookmarksSheet.swift */,
+				B0B0C0D0E0F1011121314DD4 /* BrowserSheets.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -214,24 +176,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				A0B0C0D0E0F1011121314151 /* HistoryEncryptedBrowserApp.swift in Sources */,
-				A0B0C0D0E0F1011121314152 /* BrowserNavigationSnapshot.swift in Sources */,
-				A0B0C0D0E0F1011121314153 /* AddressResolving.swift in Sources */,
-				A0B0C0D0E0F1011121314154 /* BrowserProtocols.swift in Sources */,
+				A0B0C0D0E0F1011121314DD1 /* BrowserNavigation.swift in Sources */,
+				A0B0C0D0E0F1011121314DD3 /* PlainHistoryAndBookmarks.swift in Sources */,
+				A0B0C0D0E0F1011121314DD4 /* BrowserSheets.swift in Sources */,
 				A0B0C0D0E0F1011121314155 /* BrowserViewModel.swift in Sources */,
 				A0B0C0D0E0F1011121314156 /* BrowserView.swift in Sources */,
 				A0B0C0D0E0F1011121314157 /* BrowserWebView.swift in Sources */,
-				A0B0C0D0E0F1011121314BB1 /* URLHistoryNormalize.swift in Sources */,
-				A0B0C0D0E0F1011121314BB2 /* VaultTypes.swift in Sources */,
-				A0B0C0D0E0F1011121314BB3 /* VaultCryptoService.swift in Sources */,
-				A0B0C0D0E0F1011121314BB4 /* IncognitoVaultStore.swift in Sources */,
-				A0B0C0D0E0F1011121314BB5 /* PrivateHistoryRecorder.swift in Sources */,
-				A0B0C0D0E0F1011121314BB6 /* VaultHistorySheet.swift in Sources */,
-				A0B0C0D0E0F1011121314BC1 /* BrowsingMode.swift in Sources */,
-				A0B0C0D0E0F1011121314BC2 /* PlainHistoryStore.swift in Sources */,
-				A0B0C0D0E0F1011121314BC3 /* NormalHistoryRecorder.swift in Sources */,
-				A0B0C0D0E0F1011121314BC4 /* NormalHistorySheet.swift in Sources */,
-				A0B0C0D0E0F1011121314BC5 /* BookmarksStore.swift in Sources */,
-				A0B0C0D0E0F1011121314BC6 /* BookmarksSheet.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -384,7 +334,6 @@
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "HistoryEncryptedBrowser/HistoryEncryptedBrowser-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -417,7 +366,6 @@
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "HistoryEncryptedBrowser/HistoryEncryptedBrowser-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

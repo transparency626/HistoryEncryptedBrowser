@@ -126,7 +126,7 @@ struct BrowserWebView: UIViewRepresentable {
             }
         }
 
-        /// 标题变化时通知 VM，由 VM 决定更新明文历史还是加密历史。
+        /// 标题变化时通知 VM（仅普通模式会写入历史）。
         func observeTitle(webView: WKWebView) {
             titleObservation = webView.observe(\.title, options: [.new]) { [weak self] wv, _ in
                 Task { @MainActor in
@@ -234,7 +234,7 @@ struct BrowserWebView: UIViewRepresentable {
             Task { @MainActor in
                 // 主文档加载完成，pending URL 不再需要。
                 self.lastRequestedURL = nil
-                // VM 内会写历史（明文或加密）。
+                // VM 内按模式写历史（仅普通模式）。
                 viewModel?.handleLoadFinished(snapshot: snapshot(from: webView))
             }
         }

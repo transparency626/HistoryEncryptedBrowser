@@ -1,18 +1,14 @@
 // SwiftUI：声明式 UI、View、@State、sheet 等。
 import SwiftUI
 
-/// 主界面：地址栏、模式切换、Web、底栏、两个 sheet；不出现 WKWebView 类型名。
+/// 主界面：地址栏、模式切换、Web、底栏；不出现 WKWebView 类型名。
 struct BrowserView: View {
-    // 从环境里读「场景阶段」：active / inactive / background，用来进后台时锁保险库。
-    @Environment(\.scenePhase) private var scenePhase
     // StateObject：ViewModel 只创建一次，和本 View 同生命周期；用 ObjectWillChange 驱动刷新。
     @StateObject private var viewModel = BrowserViewModel()
     // FocusState：跟踪地址栏是否在编辑；加载完成时若未聚焦才把网页 URL 写回地址栏。
     @FocusState private var addressFocused: Bool
-    // 控制「明文历史」半屏是否弹出。
+    // 控制「浏览历史」半屏是否弹出（仅普通模式使用）。
     @State private var showNormalHistory = false
-    // 控制「无痕加密历史」半屏是否弹出。
-    @State private var showVaultHistory = false
     // 控制「收藏夹」列表 sheet。
     @State private var showBookmarks = false
 
@@ -97,20 +93,10 @@ struct BrowserView: View {
                 viewModel.syncAddressBarFromWebIfNeeded(addressFieldFocused: addressFocused)
             }
         }
-        // 场景阶段变化：离开前台就锁保险库，防止切回 App 仍显示解密列表。
-        .onChange(of: scenePhase) { _, phase in
-            // 非 active：含 inactive（多任务预览、控制中心）和 background（回桌面）。
-            if phase != .active {
-                viewModel.lockVault()
-            }
-        }
         // 第一个 sheet：绑定到 showNormalHistory，为 true 时以模态呈现。
         .sheet(isPresented: $showNormalHistory) {
             // 传入同一个 viewModel，列表和浏览器共享数据。
             NormalHistorySheet(viewModel: viewModel)
-        }
-        .sheet(isPresented: $showVaultHistory) {
-            VaultHistorySheet(viewModel: viewModel)
         }
         .sheet(isPresented: $showBookmarks) {
             BookmarksSheet(viewModel: viewModel)
@@ -227,8 +213,8 @@ struct BrowserView: View {
             // 两段说明文字用三元表达式选其一。
             Text(
                 viewModel.browsingMode == .incognito
-                    ? "不持久保存 Cookie 与站点数据；访问记录可加密写入保险库（底部锁图标，需先设密码）。"
-                    : "站点数据会持久保存；浏览历史（时钟）与收藏夹（星标/书本）均为明文保存，与无痕加密库互不混用。"
+                    ? "不持久保存 Cookie 与站点数据；关闭 App 后无痕会话内的站点数据会清除。本应用不记录无痕浏览历史。"
+                    : "站点数据会持久保存；可使用浏览历史与收藏夹（均为保存在本机的明文数据）。"
             )
             .font(.footnote)
             .foregroundStyle(.secondary)
@@ -265,17 +251,12 @@ struct BrowserView: View {
                 .buttonStyle(.plain)
                 .accessibilityLabel("浏览历史")
             } else {
-                // 无痕模式：打开加密保险库 sheet。
-                Button {
-                    showVaultHistory = true
-                } label: {
-                    Image(systemName: "lock.rectangle.stack")
-                        .font(.body.weight(.semibold))
-                        .frame(width: 44, height: 44)
-                        .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel("无痕加密历史")
+                // 无痕模式不保存历史：占位与「时钟」同宽，保持底栏对齐。
+                Image(systemName: "eye.slash")
+                    .font(.body.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                    .frame(width: 44, height: 44)
+                    .accessibilityLabel("无痕模式不记录浏览历史")
             }
 
             // 星标：当前为 http(s) 页时可点；已收藏为实心星，再点取消收藏。
@@ -288,11 +269,11 @@ struct BrowserView: View {
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            .disabled(shareURL == nil)
-            .opacity(shareURL == nil ? 0.35 : 1)
+            .disabled(shareURL == nil || viewModel.browsingMode == .incognito)
+            .opacity((shareURL == nil || viewModel.browsingMode == .incognito) ? 0.35 : 1)
             .accessibilityLabel(viewModel.isCurrentPageBookmarked ? "取消收藏" : "收藏本页")
 
-            // 打开收藏夹列表（与历史一样明文存盘）。
+            // 收藏夹：无痕模式下仍可打开列表并跳转，但不会新增收藏。
             Button {
                 showBookmarks = true
             } label: {
